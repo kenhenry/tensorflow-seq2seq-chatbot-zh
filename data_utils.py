@@ -52,7 +52,7 @@ def basic_tokenizer(sentence):
   return [w for w in words if w]
 
 def split_chinese(sentence):
-    line=re.split(u'【（。，！？、“：；）】',sentence)
+    line=re.split(u'【（。，！？、“：；）】',sentence.decode('utf-8'))
     '''for l in line:
         print (l)'''
     ws=[]
@@ -74,10 +74,11 @@ def create_vocabulary(vocabulary_path, data_path, max_vocabulary_size,
         counter += 1
         if counter % 100000 == 0:
           print("  processing line %d" % counter)
-        # tokens = tokenizer(line) if tokenizer else basic_tokenizer(line)  # mark by Ken
-          tokens = split_chinese(line)  # add by Ken
+        # tokens = tokenizer(line) if tokenizer else basic_tokenizer(line)  # mark by ken
+        tokens = split_chinese(line)  # add by Ken
         for w in tokens:
-          word = re.sub(_DIGIT_RE, b"0", w) if normalize_digits else w
+          # word = re.sub(_DIGIT_RE, b"0", w) if normalize_digits else w   # mark by ken
+          word = w  # add by ken
           if word in vocab:
             vocab[word] += 1
           else:
@@ -88,8 +89,13 @@ def create_vocabulary(vocabulary_path, data_path, max_vocabulary_size,
         vocab_list = vocab_list[:max_vocabulary_size]
       with gfile.GFile(vocabulary_path, mode="wb") as vocab_file:
         for w in vocab_list:
-          vocab_file.write(w + b"\n")
-
+          # vocab_file.write(w + b"\n")  # mark by ken
+          if type(w) is str:
+              words = bytes(w.encode('utf-8')) + b"\n"  # edit
+              vocab_file.write(words)
+          else:
+              words = w + b"\n"  # edit
+              vocab_file.write(words)
 
 def initialize_vocabulary(vocabulary_path):
 
@@ -109,7 +115,9 @@ def sentence_to_token_ids(sentence, vocabulary, tokenizer=None, normalize_digits
   if tokenizer:
     words = tokenizer(sentence)
   else:
-    words = basic_tokenizer(sentence)
+    words = basic_tokenizer(sentence)  # mark by Ken
+    # words = split_chinese(sentence)  # add by Ken
+
   if not normalize_digits:
     return [vocabulary.get(w, UNK_ID) for w in words]
   # Normalize digits by 0 before looking words up in the vocabulary.
