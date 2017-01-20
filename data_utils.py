@@ -51,6 +51,15 @@ def basic_tokenizer(sentence):
     words.extend(re.split(_WORD_SPLIT, space_separated_fragment))
   return [w for w in words if w]
 
+def split_chinese(sentence):
+    line=re.split(u'【（。，！？、“：；）】',sentence)
+    '''for l in line:
+        print (l)'''
+    ws=[]
+    for words in line:
+        for w in words:
+            ws.append(w)
+    return  ws
 
 def create_vocabulary(vocabulary_path, data_path, max_vocabulary_size,
                       tokenizer=None, normalize_digits=True):
@@ -65,7 +74,8 @@ def create_vocabulary(vocabulary_path, data_path, max_vocabulary_size,
         counter += 1
         if counter % 100000 == 0:
           print("  processing line %d" % counter)
-        tokens = tokenizer(line) if tokenizer else basic_tokenizer(line)
+        # tokens = tokenizer(line) if tokenizer else basic_tokenizer(line)  # mark by Ken
+          tokens = split_chinese(line)  # add by Ken
         for w in tokens:
           word = re.sub(_DIGIT_RE, b"0", w) if normalize_digits else w
           if word in vocab:
