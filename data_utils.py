@@ -115,14 +115,14 @@ def sentence_to_token_ids(sentence, vocabulary, tokenizer=None, normalize_digits
   if tokenizer:
     words = tokenizer(sentence)
   else:
-    words = basic_tokenizer(sentence)  # mark by Ken
-    # words = split_chinese(sentence)  # add by Ken
+    # words = basic_tokenizer(sentence)  # mark by Ken
+    words = split_chinese(sentence)  # add by Ken
 
   if not normalize_digits:
     return [vocabulary.get(w, UNK_ID) for w in words]
   # Normalize digits by 0 before looking words up in the vocabulary.
   # return [vocabulary.get(re.sub(_DIGIT_RE, b"0", w), UNK_ID) for w in words] #mark added .decode by Ken
-  return [vocabulary.get(w.decode('utf-8'), UNK_ID) for w in words] # added  by Ken
+  return [vocabulary.get(w, UNK_ID) for w in words] # added  by Ken
 
 
 def data_to_token_ids(data_path, target_path, vocabulary_path,
